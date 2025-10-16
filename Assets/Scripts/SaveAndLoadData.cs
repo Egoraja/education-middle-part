@@ -27,8 +27,7 @@ public class SaveAndLoadData : MonoBehaviour
         if (Instance == null)        
             Instance = this;                  
         else        
-            Destroy(gameObject);
-        return;        
+            Destroy(gameObject);              
     }
 
     private async void Start()
