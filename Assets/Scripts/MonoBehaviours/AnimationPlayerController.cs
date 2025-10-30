@@ -10,7 +10,6 @@ public class AnimationPlayerController : MonoBehaviour
     private float wavingTime;
     private bool isWaving = false;   
     private bool isDead = false;   
-
    
     private Animator playerAnimator;    
     private int upperBodyLayerIndex;
@@ -49,15 +48,13 @@ public class AnimationPlayerController : MonoBehaviour
 
     public void PlayDeathAnim()
     {
-        if (isDead)        
-            return;        
-        else       
-            playerAnimator.SetTrigger("IsDead");        
+        isDead = true;
+        playerAnimator.SetTrigger("IsDead");
     }
 
     public void PlayWavingAnim()
     {
-        if (isWaving == false && horizontalSpeed <= walkSpeed )
+        if (isWaving == false && horizontalSpeed <= walkSpeed && isDead == false)
         {
             isWaving = true;
             currentWeightAdditiveLayer = weightAdditivelayer;

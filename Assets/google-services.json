@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "224158198947",
+    "firebase_url": "https://charactersaver-5f805-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "charactersaver-5f805",
+    "storage_bucket": "charactersaver-5f805.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224158198947:android:91e382a9a3783bfdd1e316",
+        "android_client_info": {
+          "package_name": "com.charactersaver.fbdirectory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiojC4GHkfh3sSzI7EF-f_0tTL9HVdezg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224158198947:android:4a4fde6c0bb6f78bd1e316",
+        "android_client_info": {
+          "package_name": "com.charactersaver.firebasedb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiojC4GHkfh3sSzI7EF-f_0tTL9HVdezg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

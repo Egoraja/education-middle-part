@@ -9,19 +9,6 @@ using System;
 
 public class HeavyMethods : MonoBehaviour
 {
- 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            HeavyMethods1();
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            HeavyUniRXMethods();
-        }
-    }
-
     private void PrintText()
     {
         for (int i = 0; i < 5; i++)
@@ -59,5 +46,20 @@ public class HeavyMethods : MonoBehaviour
                 Debug.Log(rx[0]);
                 Debug.Log(rx[1]);
             });
-    }            
+    }           
+ 
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            HeavyMethods1();
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            HeavyUniRXMethods();        
+        }
+    }
+
+    
 }

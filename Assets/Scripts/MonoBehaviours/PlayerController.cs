@@ -119,27 +119,7 @@ public class PlayerController : MonoBehaviour
         }
         
         currentSpeed = walkSpeed * accelerationCurveWalk.Evaluate(speedWalkProgress) +
-                      runSpeed * accelerationCurveWalk.Evaluate(speedRunProgress);
-
-        //if (wantsToMove && wantsToRun == false)
-        //{            
-        //    speedWalkProgress = Mathf.Clamp01(speedWalkProgress + Time.deltaTime / accelerationTime);
-        //    speedRunProgress = Mathf.Clamp01(speedRunProgress - Time.deltaTime / decelerationTime);
-        //    currentSpeed = walkSpeed * (accelerationCurveWalk.Evaluate(speedWalkProgress)) + runSpeed *(accelerationCurveWalk.Evaluate(speedRunProgress));
-        //}
-
-        //else if (wantsToMove == false && wantsToRun == false)
-        //{          
-        //    speedWalkProgress = Mathf.Clamp01(speedWalkProgress - Time.deltaTime / decelerationTime);
-        //    speedRunProgress = Mathf.Clamp01(speedRunProgress - Time.deltaTime / decelerationTime);
-        //    currentSpeed = walkSpeed * (accelerationCurveWalk.Evaluate(speedWalkProgress)) + runSpeed * (accelerationCurveWalk.Evaluate(speedRunProgress));
-        //}
-        //else if (wantsToMove && wantsToRun)
-        //{          
-        //    speedWalkProgress = Mathf.Clamp01(speedWalkProgress + Time.deltaTime / accelerationTime);
-        //    speedRunProgress = Mathf.Clamp01(speedRunProgress + Time.deltaTime / accelerationTime);            
-        //    currentSpeed = walkSpeed * (accelerationCurveWalk.Evaluate(speedWalkProgress)) + runSpeed * (accelerationCurveWalk.Evaluate(speedRunProgress)); 
-        //}      
+                      runSpeed * accelerationCurveWalk.Evaluate(speedRunProgress);      
     }
 
     private void ApplyMovement()
@@ -164,6 +144,10 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))        
             animationPlayerController.PlayWavingAnim();
+        if (Input.GetKeyDown(KeyCode.Mouse0))        
+            Debug.Log("FIRE");
+        
+
 
         if (isDead == true)
             animationPlayerController.PlayDeathAnim();                  

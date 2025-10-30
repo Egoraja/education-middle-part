@@ -20,9 +20,9 @@ public class EnvironmentInteractionStateMachine : ManagerState<EnvironmentIntera
 
     private void Awake()
     {
-        ValidateConstraints();
         context = new EnvironmentInteractionContext(_leftHandIKConstraint, _rightHandIKConstraint,
             _leftHandMultiRConstraint, _rightHandMultiRConstraint, _characterController, transform.root, interactableLayer);
+        ValidateConstraints();
         InitializeState();
         ConstructEnvironmentDetectionCollider();
     }   
@@ -43,7 +43,7 @@ public class EnvironmentInteractionStateMachine : ManagerState<EnvironmentIntera
         States.Add(EEnvironmentInteraction.Approach, new ApproachState(context, EEnvironmentInteraction.Approach));
         States.Add(EEnvironmentInteraction.Rise, new RiseState(context, EEnvironmentInteraction.Rise));
         States.Add(EEnvironmentInteraction.Touch, new TouchState(context, EEnvironmentInteraction.Touch));
-        CurrentState = States[EEnvironmentInteraction.Approach];
+        CurrentState = States[EEnvironmentInteraction.Search];
     }
 
     private void ConstructEnvironmentDetectionCollider()

@@ -1,67 +1,51 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class PlayerData : MonoBehaviour
-{
-    [Header("Default Values")]
-    [SerializeField] private float defaultSpeed = 1f;
-    [SerializeField] private float defaultHealth = 10f;
-    [Space(5)]
-
-    [Header("Current Values")]
+[Serializable]
+public class PlayerData
+{      
+    [SerializeField] private float score;
+    [SerializeField] private int level;
+    [SerializeField] private float scoreToNextLevel;
     [SerializeField] private float currentSpeed;
-    [SerializeField] private float currentHealth;
-    public float Speed { get { return currentSpeed; } private set { currentSpeed = value; } }
-    public float Health { get { return currentHealth; } private set { currentHealth = value; } }
-
-
-    private void Start()
+    [SerializeField] private float currentHealth;    
+        
+    public float Speed { get { return currentSpeed; } set { currentSpeed = value; } }
+    public float Health { get { return currentHealth; } set { currentHealth = value; } }
+    public float Score { get { return score; } set { score = value; } }
+    public float ScoreToNextLevel { get { return scoreToNextLevel; } set { scoreToNextLevel = value; } }
+    public int Level { get { return level; } set { level = value; } }
+        
+    public PlayerData()
     {
-        InitializeWithDefaults();
-        if (SaveAndLoadData.Instance != null)
+    }
+
+    public PlayerData(PlayerDefaultSettings playerDefaultSettings)
+    {
+        if (playerDefaultSettings == null)
         {
-            SaveAndLoadData.Instance.OnDataLoaded += ApplyLoadedData;
-            SaveAndLoadData.Instance.OnDataLoadFailed += OnDataLoadFailed;
-
-            if (SaveAndLoadData.Instance.IsDataLoaded)
-            {
-                ApplyLoadedData(SaveAndLoadData.Instance.CurrentConfig);
-            }
+            Debug.LogError("PlayerDefaultSettings is null!");
+            return;
         }
-        else
-        {
-            Debug.LogWarning("SaveAndLoadData instance not found!");
-        }
+        this.score = playerDefaultSettings.DefaultScore;
+        this.level = playerDefaultSettings.DefaultLevel;
+        this.scoreToNextLevel = playerDefaultSettings.DefaultScoreToNextLevel;
+        this.currentSpeed = playerDefaultSettings.DefaultSpeed;
+        this.currentHealth = playerDefaultSettings.DefaultHealth;  
+        Debug.Log("PlayerData created with default settings");       
     }
 
-    private void InitializeWithDefaults()
-    {        
-        currentSpeed = defaultSpeed;
-        currentHealth = defaultHealth;
-        Debug.Log($"Initialized with defaults - Speed: {Speed}, Health: {Health}");
-    }
-
-    private void ApplyLoadedData(PlayerDataConfig config)
-    {
-        currentSpeed = config.speed;
-        currentHealth = config.health;
-        Debug.Log($"Data applied: Speed={Speed}, Health={Health}");
-    }
-
-    private void OnDestroy()
-    {
-        if (SaveAndLoadData.Instance != null)
-        {
-            SaveAndLoadData.Instance.OnDataLoaded -= ApplyLoadedData;
-            SaveAndLoadData.Instance.OnDataLoadFailed -= OnDataLoadFailed;
-        }
-    }
-
-    private void OnDataLoadFailed(string error)
-    {
-        Debug.LogWarning($"Failed to load player data: {error}. Using default values.");          
+    public PlayerData(float score, int currentLevel, float scoreToNextLevel, float currentSpeed, float currentHealth)
+    {     
+        this.score = score;
+        this.level = currentLevel;
+        this.scoreToNextLevel = scoreToNextLevel;
+        this.currentSpeed = currentSpeed;
+        this.currentHealth = currentHealth;         
     }
 }
 

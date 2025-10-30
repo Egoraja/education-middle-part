@@ -45,12 +45,15 @@ public class ResetState : EnvironmentInteractionState
     {}
 
     public override void UpdateState()
-    {       
-        elapsedTime += Time.deltaTime;        
+    {
+        elapsedTime += Time.deltaTime;
         Context.InteractionPointYOffset = Mathf.Lerp(Context.InteractionPointYOffset, Context.ColliderCenterY, elapsedTime / lerpDuration);
-        Context.CurrentIKConstraint.weight = Mathf.Lerp(Context.CurrentIKConstraint.weight, 0, elapsedTime / lerpDuration);
-        Context.CurrentMultiRConstraint.weight = Mathf.Lerp(Context.CurrentMultiRConstraint.weight, 0, elapsedTime / lerpDuration);
-        Context.CurrentIKTargetTransform.localPosition = Vector3.Lerp(Context.CurrentIKTargetTransform.localPosition, Context.CurrentOriginalTargetPosition, elapsedTime / lerpDuration);
-        Context.CurrentIKTargetTransform.rotation = Quaternion.RotateTowards(Context.CurrentIKTargetTransform.rotation, Context.OriginalTargetRotation, rotationSpeed * Time.deltaTime);
+        if (Context.CurrentIKConstraint != null && Context.CurrentMultiRConstraint != null && Context.CurrentIKTargetTransform)
+        {
+            Context.CurrentIKConstraint.weight = Mathf.Lerp(Context.CurrentIKConstraint.weight, 0, elapsedTime / lerpDuration);
+            Context.CurrentMultiRConstraint.weight = Mathf.Lerp(Context.CurrentMultiRConstraint.weight, 0, elapsedTime / lerpDuration);
+            Context.CurrentIKTargetTransform.localPosition = Vector3.Lerp(Context.CurrentIKTargetTransform.localPosition, Context.CurrentOriginalTargetPosition, elapsedTime / lerpDuration);
+            Context.CurrentIKTargetTransform.rotation = Quaternion.RotateTowards(Context.CurrentIKTargetTransform.rotation, Context.OriginalTargetRotation, rotationSpeed * Time.deltaTime);
+        }
     }
 }
