@@ -7,7 +7,12 @@ using UnityEngine.Rendering;
 public class LevelUpHealth : MonoBehaviour, ILevelUp
 {
     private float[] healthStages;
-    [SerializeField] private CharacterHealth characterHealth;
+    private CharacterHealth characterHealth;
+
+    private void Start()
+    {
+        characterHealth = GetComponent<CharacterHealth>();
+    }
 
     public void LevelUp(int level, int maxLevel)
     {
@@ -24,7 +29,7 @@ public class LevelUpHealth : MonoBehaviour, ILevelUp
         {
             SetHealthStages(maxLevel);
         }
-        characterHealth.SetConfiguration(healthStages[level - 1]);
+        characterHealth.SetConfiguration(healthStages[level - 1]);        
     }
 
     private void SetHealthStages(int maxLevel)

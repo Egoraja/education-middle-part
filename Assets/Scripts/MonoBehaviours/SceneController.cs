@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SceneController : MonoBehaviour
 {
     [SerializeField] private Button inventoryButton;
+    [SerializeField] private GameObject craftButton;
     [SerializeField] private GameObject inventoryPanel;
 
     private bool isInventoryOpened;
@@ -15,6 +16,7 @@ public class SceneController : MonoBehaviour
     {      
         isInventoryOpened = false;
         inventoryPanel.SetActive(false);
+        craftButton.SetActive(false);
     }
     public void RestartLevel()
     {
@@ -27,11 +29,13 @@ public class SceneController : MonoBehaviour
         if (isInventoryOpened == false)
         {
             inventoryPanel.SetActive(true);
+            craftButton.SetActive(true);
             isInventoryOpened = true;
         }
         else
         {
-            inventoryPanel.SetActive(false);
+            inventoryPanel.SetActive(false);            
+            craftButton.SetActive(false);
             isInventoryOpened = false;
         }
     }

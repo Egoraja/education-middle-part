@@ -9,12 +9,29 @@ public class PlayerProgressManager : MonoBehaviour
     [SerializeField] private int maxLevel;
     [SerializeField] private int firstGrade = 10;
     [SerializeField] private bool useFibonacci = true;
+    private InventoryManager inventoryManager;
     private PlayerData playerData;
     private FireBaseManager fireBaseManager;
+    private CharacterHealth characterHealth;
     private float scoreToNextLevel = 0;
     private float score;
     private int currentLevel;
     private bool playerDataInFB = false;
+
+    private void Start()
+    {
+        inventoryManager = GetComponent<InventoryManager>();
+        characterHealth = GetComponent<CharacterHealth>();
+    }
+    public void SetCurrentProgress(PlayerData playerData, FireBaseManager fireBaseManager, bool playerDataInFB)
+    {
+        this.playerData = playerData;
+        this.fireBaseManager = fireBaseManager;
+        this.playerDataInFB = playerDataInFB;
+        this.score = playerData.Score;       
+        currentLevel = playerData.Level;        
+        SetScoreGrades(currentLevel);
+    }
 
     public void AddNewScore(float score)
     {
@@ -27,14 +44,20 @@ public class PlayerProgressManager : MonoBehaviour
         }        
     }
 
-    public void SetCurrentProgress(PlayerData playerData, FireBaseManager fireBaseManager, bool playerDataInFB)
+    public void AddHealth(float healthUpVolume)
     {
-        this.playerData = playerData;
-        this.fireBaseManager = fireBaseManager;
-        this.playerDataInFB = playerDataInFB;
-        this.score = playerData.Score;       
-        currentLevel = playerData.Level;        
-        SetScoreGrades(currentLevel);
+        characterHealth.ApplyHealing(healthUpVolume);    
+    }
+
+    public void AddShield()
+    {
+        characterHealth.AddShield();    
+    }
+
+    public void AddNewItem(GameObject uIItem)
+    {
+        bool isReadyTocraft = false;
+        inventoryManager.AddNewItem(uIItem, isReadyTocraft);
     }
 
     private void SetScoreGrades(int currentLevel)
@@ -103,16 +126,13 @@ public class PlayerProgressManager : MonoBehaviour
                 if (action is ILevelUp levelUp == false) return;
                 levelUp.SetCongiguration(currentLevel, maxLevel);
             }
-        }
-        Debug.Log(currentLevel + " Current Level");
-        Debug.Log(scoreToNextLevel + " score to next Level");
+        }       
     }
 
-    private void Update()
+    public void PrintInfo()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            AddNewScore(10);
-        }        
+        Debug.Log(score + ">>>>> SCORE");
+        Debug.Log(scoreToNextLevel + ">>>>> SCORE TO NEXT LEVEL");
+        Debug.Log(currentLevel + ">>>>> LEVEL");   
     }
 }

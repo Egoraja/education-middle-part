@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e2efe4be9b18f1409ff95f48df139c5, type: 3}
+  m_Name: CraftSettings
+  m_EditorClassIdentifier: 
+  CraftCombinations:
+  - Sources:
+    - Health
+    - Shield
+    Results:
+    - {fileID: 5814709909242933707, guid: a47f95b20bcdd1b448fa3490942093c1, type: 3}
+  - Sources:
+    - Health2
+    - Health2
+    Results:
+    - {fileID: 5814709909242933707, guid: b6291d59fc68d9e43b90eaaa2ad0726a, type: 3}
+    - {fileID: 1915997945618851096, guid: 3eadbc6378e008c4680acd962810f0a5, type: 3}
+    - {fileID: 1915997945618851096, guid: 3eadbc6378e008c4680acd962810f0a5, type: 3}
+    - {fileID: 5814709909242933707, guid: b6291d59fc68d9e43b90eaaa2ad0726a, type: 3}

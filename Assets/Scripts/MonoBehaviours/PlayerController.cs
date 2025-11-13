@@ -144,10 +144,9 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))        
             animationPlayerController.PlayWavingAnim();
+
         if (Input.GetKeyDown(KeyCode.Mouse0))        
             Debug.Log("FIRE");
-        
-
 
         if (isDead == true)
             animationPlayerController.PlayDeathAnim();                  

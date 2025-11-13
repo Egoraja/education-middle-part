@@ -12,7 +12,7 @@ public class SettingsInspector : Editor
 
     private void OnEnable()
     {
-        health = serializedObject.FindProperty("EnemyHealth");
+        health = serializedObject.FindProperty(nameof(EnemySettings.EnemyHealth));
     }
 
     public override void OnInspectorGUI()

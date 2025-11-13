@@ -18,7 +18,6 @@ public class CharacterDataSaver : MonoBehaviour
     private string localPath;
     private bool playerDataInFB = false;
 
-
     private async void Start()
     {
         localPath = Application.persistentDataPath + "/PlayerData.json";
