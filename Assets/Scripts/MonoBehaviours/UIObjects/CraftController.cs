@@ -16,14 +16,13 @@ public class CraftController : MonoBehaviour
     [SerializeField] private Text craftButtonText;
     [SerializeField] private string craftButtonText1 = "Craft";
     [SerializeField] private string craftButtonText2 = "Crafting";
-
+    private List<GameObject> targets = new List<GameObject>();
     private Image craftButtonImage;
-
     private List<Button> buttons = new List<Button>();
-
     private List<GameObject> selected = new List<GameObject>();
-
+    private List<GameObject> orderToInstantiate;
     private bool isCrafting = false;
+    private float delay = 0;
 
     public void EnterCraftMode()
     {
@@ -31,7 +30,7 @@ public class CraftController : MonoBehaviour
         if (isCrafting == false)
         {
             buttons = FindCraftAbleObjects();
-            if (buttons.Count < 1)
+            if (buttons.Count == 0)
                 return;
 
             craftButtonText.text = craftButtonText2;
@@ -39,7 +38,10 @@ public class CraftController : MonoBehaviour
             isCrafting = true;
             selected.Clear();
             foreach (var item in buttons)
+            {
                 item.onClick.AddListener(() => Select(item.gameObject));
+                item.GetComponent<ICraftAble>().IsReadyToCraft = true;
+            }
         }
 
         else
@@ -55,26 +57,6 @@ public class CraftController : MonoBehaviour
             CraftCanceled(buttons);
         }       
     }
-
-    private List<Button> FindCraftAbleObjects()
-    {
-        List<Button> currentList = new List<Button>();
-        foreach (Transform item in inventory)
-        {
-            if (item.childCount > 0)
-            {
-                var temp = item.GetChild(0);
-
-                if (temp.TryGetComponent(out ICraftAble craftAble) && temp.GetComponent<Button>())
-                {
-                    craftAble.IsReadyToCraft = true;
-                    currentList.Add(temp.GetComponent<Button>());
-                }
-            }
-        }
-        return currentList;
-    }
-
     public void Select(GameObject gameObject)
     {       
         if (selected.Contains(gameObject))
@@ -90,6 +72,22 @@ public class CraftController : MonoBehaviour
         CheckCombination();
     }
 
+    private List<Button> FindCraftAbleObjects()
+    {
+        List<Button> currentList = new List<Button>();
+        foreach (Transform item in inventory)
+        {
+            if (item.childCount > 0)
+            {
+                var temp = item.GetChild(0);
+
+                if (temp.TryGetComponent(out ICraftAble craftAble) && temp.GetComponent<Button>())                                    
+                    currentList.Add(temp.GetComponent<Button>());                
+            }
+        }
+        return currentList;
+    }
+    
     private void CraftCanceled(List<Button> buttons)
     {
         foreach (var button in buttons)
@@ -97,14 +95,15 @@ public class CraftController : MonoBehaviour
             if(button.gameObject.TryGetComponent(out ICraftAble craftAble))
                 craftAble.IsReadyToCraft = false;           
             button.gameObject.GetComponent<Image>().color = new Color(1, 1, 1, 1);
-        }    
+        }
+        buttons.Clear();
     }
 
     private void CheckCombination()
     {
         List<string> selectedNames = new List<string>();       
         List<GameObject> orderToDel = new List<GameObject>();
-        List<GameObject> orderToInstantiate = new List<GameObject>();
+        orderToInstantiate = new List<GameObject>();
 
         foreach (var name in selected)        
             selectedNames.Add(name.GetComponent<ICraftAble>().Name);        
@@ -114,37 +113,58 @@ public class CraftController : MonoBehaviour
         {
             combination.Sources.Sort();
             if (combination.Sources.SequenceEqual(selectedNames))
-            {                 
+            {
+                targets.Clear();
                 orderToDel.AddRange(selected);            
-                orderToInstantiate = combination.Results;
+                orderToInstantiate.AddRange(combination.Results);
                 selected.Clear();
-                selectedNames.Clear();                                           
+                selectedNames.Clear();                   
             }
         }
         
         foreach (var item in orderToDel)
-        {              
-            buttons.Remove(item.GetComponent<Button>());
+        {
+            if (targets.Count == 0)
+                targets = item.GetComponent<IItemAbility>().Targets;
             Destroy(item);
         }
-        UpdateInventory(orderToInstantiate);
+        if (orderToInstantiate.Count > 0)
+            delay = 0.1f;     
     }
 
     private void UpdateInventory(List<GameObject> orderToInstantiate)
-    {
+    {        
         if (orderToInstantiate.Count == 0)
             return;
         else
-        {
-            bool isReadyToCraft = true;
+        {            
             foreach (var item in orderToInstantiate)
-            {                            
-                Instantiate(item, inventoryManager.GetPosition());
-                var itemButton = item.GetComponent<Button>();
-                buttons.Add(itemButton);
-                itemButton.onClick.AddListener(() => Select(item));
-                inventoryManager.AddNewItem(item, isReadyToCraft);                
-            }
-        }            
+            {
+                Transform position = inventoryManager.GetPosition();
+                Debug.Log(position == null);
+                if (position != null)
+                {
+                    GameObject newItem = Instantiate(item, inventoryManager.GetPosition());
+                    newItem.GetComponent<IItemAbility>().Targets.AddRange(targets);
+                }
+            }            
+        }
+        foreach (var item in buttons)
+            item.onClick.RemoveAllListeners();
+        isCrafting = false;         
+        EnterCraftMode();    
+    }
+
+    private void Update()
+    {
+        if (delay > 0)
+        {
+            delay -= Time.deltaTime;
+            if (delay < 0)
+            {
+                UpdateInventory(orderToInstantiate);
+                delay = 0;            
+            }        
+        }
     }
 }

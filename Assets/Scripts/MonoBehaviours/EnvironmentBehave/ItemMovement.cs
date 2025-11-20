@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemMovement : MonoBehaviour
-{
-    [SerializeField] private float moveSpeed;
+{    
     [SerializeField, Range(1f, 5f)] private float rotationSpeed;
     private Vector3 currentPosition;
 

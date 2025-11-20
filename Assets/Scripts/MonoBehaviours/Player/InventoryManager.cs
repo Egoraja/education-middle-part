@@ -5,7 +5,7 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private Transform inventory;
-    private Transform[] inventorySlots;
+    private Transform[] inventorySlots;    
 
     private void Start()
     {       
@@ -13,21 +13,20 @@ public class InventoryManager : MonoBehaviour
     }
 
     public Transform GetPosition()
-    {
+    {       
         Transform temp = null;
         for (int i = 0; i < inventorySlots.Length; i++)
-        {
-            Debug.Log(i);
+        {           
             if (inventorySlots[i].childCount == 0)
             {
                 temp = inventorySlots[i];
                 break;
-            }
+            }           
         }
         return temp;
     }
 
-    public void AddNewItem(GameObject uIItem, bool isReadyToCraft)
+    public void AddNewItem(GameObject uIItem, bool isReadyToCraft, GameObject target)
     {        
         for (int i = 0; i < inventorySlots.Length; i++)
         {
@@ -35,18 +34,17 @@ public class InventoryManager : MonoBehaviour
             if (inventorySlots[i].childCount == 0)
             {
                 if (isReadyToCraft == true)
-                    newItem = uIItem;                   
-                
+                    newItem = uIItem;                                  
                 else                     
                     newItem = Instantiate(uIItem, inventorySlots[i]);                    
                 
                 newItem.TryGetComponent(out IItemAbility itemAbility);
-                itemAbility.AddTarget(gameObject);
+                itemAbility.AddTarget(target);
                 itemAbility.IsReadyToCraft = isReadyToCraft;
                 break;
             }
         }    
-    }   
+    }
 
     private void SetInventory()
     {
@@ -55,7 +53,7 @@ public class InventoryManager : MonoBehaviour
         foreach (Transform t in inventory)
         {
             inventorySlots[temp] = t;
-            temp++;        
+            temp++;
         }
-    }  
+    }   
 }

@@ -20,14 +20,13 @@ public class FirstAIDAbility : MonoBehaviour, IItemAbility, ICraftAble
     {
         get { return targets; }
         set { targets = value; }
-    }    
+    }   
 
     public void AddTarget(GameObject target)
     {
         targets.Add(target);       
-    }
+    }  
     
-
     public void UseItemFromInventory()
     {
         if (isReadyToCraft == false)
@@ -35,7 +34,10 @@ public class FirstAIDAbility : MonoBehaviour, IItemAbility, ICraftAble
             foreach (GameObject target in targets)
             {
                 if (target.TryGetComponent(out PlayerProgressManager playerProgressManager))
-                    playerProgressManager.AddHealth(healtUpVolume);
+                { 
+                    if (playerProgressManager.IsAlive)                    
+                        playerProgressManager.AddHealth(healtUpVolume);                    
+                }
             }
             Destroy(gameObject, 0.01f);
         }

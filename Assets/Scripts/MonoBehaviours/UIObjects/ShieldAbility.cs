@@ -6,8 +6,8 @@ public class ShieldAbility : MonoBehaviour, IItemAbility, ICraftAble
 {
     [SerializeField] private string nameAbility = "Shield";
     public string Name => nameAbility; 
-    private List<GameObject> targets = new List<GameObject>();
     private bool isReadyToCraft = false;
+    private List<GameObject> targets = new List<GameObject>();
 
     public bool IsReadyToCraft
     {
@@ -21,7 +21,6 @@ public class ShieldAbility : MonoBehaviour, IItemAbility, ICraftAble
         set { targets = value; }    
     }
 
-
     public void AddTarget(GameObject target)
     {
         targets.Add(target);               
@@ -34,9 +33,12 @@ public class ShieldAbility : MonoBehaviour, IItemAbility, ICraftAble
             foreach (GameObject target in targets)
             {
                 if (target.TryGetComponent(out PlayerProgressManager playerProgressManager))
-                    playerProgressManager.AddShield();
+                {
+                    if (playerProgressManager.IsAlive)
+                        playerProgressManager.AddShield();
+                }
             }
-            Destroy(gameObject, 0.01f);
+            Destroy(gameObject, 0.01f);            
         }
     }   
 }

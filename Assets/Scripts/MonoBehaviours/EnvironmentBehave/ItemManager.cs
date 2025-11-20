@@ -42,8 +42,7 @@ public class ItemManager : MonoBehaviour, IPickUpAble
             {
                 Execute(playerProgressManager);
                 targetTransform = null;
-            }
-           
+            }           
         }
     }
 }
