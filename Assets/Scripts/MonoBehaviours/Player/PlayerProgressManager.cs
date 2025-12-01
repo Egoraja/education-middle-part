@@ -1,19 +1,19 @@
+using Cinemachine;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Profiling.HierarchyFrameDataView;
 
-public class PlayerProgressManager : MonoBehaviour
+public class PlayerProgressManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] private PlayerController playerController;
-    [SerializeField] private InventoryManager inventoryManager;
     [SerializeField] private int maxLevel;
     [SerializeField] private int firstGrade = 10;
     [SerializeField] private bool useFibonacci = true;
     [SerializeField] private int[] scoreGrades;
     [SerializeField] private List<MonoBehaviour> levelUpActions;
-    private PlayerData playerData;
-    private FireBaseManager fireBaseManager;
+    [SerializeField] private Transform camAncor;
+    private InventoryManager inventoryManager;
+    private PlayerController playerController;
     private CharacterHealth characterHealth;
     private ViewModel viewModel;
     private float currentHealth;
@@ -21,9 +21,11 @@ public class PlayerProgressManager : MonoBehaviour
     private float scoreToNextLevel = 0;
     private float currentScore;
     private int currentLevel;
-    private bool playerDataInFB = false;
     private bool isAlive = true;
     private bool isMoving = true;
+    private bool playerDataInFB = false;
+    private PlayerData playerData;
+    private FireBaseManager fireBaseManager;
 
     public bool IsAlive
     { get { return isAlive; } set { isAlive = value; } }
@@ -31,13 +33,20 @@ public class PlayerProgressManager : MonoBehaviour
     public bool IsMoving
     { get { return isMoving; } set { isMoving = value; playerController.IsMoving = value; } }
 
+    public InventoryManager InventoryManager
+    { set { inventoryManager = value; } }
+
+    public Transform CamAncor
+    { get { return camAncor; } }
+
 
     private void Start()
-    {       
+    {
         characterHealth = GetComponent<CharacterHealth>();
+        playerController = GetComponent<PlayerController>();
         viewModel = ViewModel.InstanceViewModel;
-        if (viewModel == null)        
-            Debug.LogError($"View Model is null");      
+        if (viewModel == null)
+            Debug.LogError($"View Model is null");
     }
 
     public void SetCurrentProgress(PlayerData playerData, FireBaseManager fireBaseManager, bool playerDataInFB)
@@ -45,9 +54,9 @@ public class PlayerProgressManager : MonoBehaviour
         this.playerData = playerData;
         this.fireBaseManager = fireBaseManager;
         this.playerDataInFB = playerDataInFB;
-        this.currentScore = playerData.Score;       
-        currentLevel = playerData.Level;       
-        SetScoreGrades(currentLevel);        
+        this.currentScore = playerData.Score;
+        currentLevel = playerData.Level;
+        SetScoreGrades(currentLevel);
     }
 
     public void AddNewScore(float score)
@@ -57,8 +66,8 @@ public class PlayerProgressManager : MonoBehaviour
         {
             if (currentLevel == maxLevel)
                 return;
-            UpdateLevel();          
-        }        
+            UpdateLevel();
+        }
     }
 
     public void AddHealth(float healthUpValue)
@@ -67,10 +76,19 @@ public class PlayerProgressManager : MonoBehaviour
         PrintInfo();
     }
 
-    public void ApplyDamage(float damageValue)
+    [PunRPC]
+    public void ApplyDamage(float damageValue, int shooterID)
     {
-        characterHealth.ApplyDamage(damageValue);
+        if (characterHealth != null)
+            characterHealth.ApplyDamage(damageValue);
         PrintInfo();
+
+        Debug.Log(shooterID + " photonView.ControllerActorNr получено");
+
+        if (shooterID > 0)
+        {
+            photonView.RPC("ReceiveEnemyInfoForShooter", RpcTarget.All, currentLevel, currentHealth, maxHealth, shooterID);
+        }
     }
 
     public void PlayerIsDead()
@@ -82,7 +100,7 @@ public class PlayerProgressManager : MonoBehaviour
 
     public void AddShield()
     {
-        characterHealth.AddShield();    
+        characterHealth.AddShield();
     }
 
     public void AddNewItem(GameObject uIItem)
@@ -93,17 +111,53 @@ public class PlayerProgressManager : MonoBehaviour
 
     public void PrintInfo()
     {
-        currentHealth = characterHealth.Health;
-        maxHealth = characterHealth.MaxHealth;
-        viewModel.Health = currentHealth.ToString();
-        viewModel.FillAmount = currentHealth / maxHealth;
-        viewModel.CurrentLevel = currentLevel.ToString();
-        viewModel.CurrentScore = currentScore.ToString();
-        if (scoreToNextLevel >= scoreGrades[scoreGrades.Length-1])
-            viewModel.ScoreToNextLevel = "Max level";
-        else
-            viewModel.ScoreToNextLevel = scoreToNextLevel.ToString();
+        if (photonView.IsMine)
+        {
+            currentHealth = characterHealth.Health;
+            maxHealth = characterHealth.MaxHealth;
+            viewModel.Health = currentHealth.ToString();
+            viewModel.FillAmount = currentHealth / maxHealth;
+            viewModel.CurrentLevel = currentLevel.ToString();
+            viewModel.CurrentScore = currentScore.ToString();
+            if (scoreToNextLevel >= scoreGrades[scoreGrades.Length - 1])
+                viewModel.ScoreToNextLevel = "Max level";
+            else
+                viewModel.ScoreToNextLevel = scoreToNextLevel.ToString();
+        }
     }
+
+    [PunRPC]
+    public void ReceiveEnemyInfoForShooter(int currentLevel, float currentHealth, float maxHealth, int shooterID)
+    {
+        if (PhotonNetwork.LocalPlayer.ActorNumber == shooterID)
+        {
+            SharingPlayerInfo enemyInfo = new SharingPlayerInfo
+            {
+                CurrentLevel = currentLevel,
+                Health = currentHealth,
+                MaxHealth = maxHealth
+            };
+            StartCoroutine(UpdateUIAfterFrame(enemyInfo));
+        }
+    }
+
+    private IEnumerator UpdateUIAfterFrame(SharingPlayerInfo enemyInfo)
+    {
+        yield return new WaitForEndOfFrame();
+
+        try
+        {
+            EnemyViewModel.InstanceEnemyViewModel.PrintInfo(enemyInfo);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"UI Update failed: {e.Message}");
+            EnemyViewModel.InstanceEnemyViewModel.PrintInfo(enemyInfo);
+        }
+    }
+
+
+
 
     private void SetScoreGrades(int currentLevel)
     {
@@ -173,5 +227,5 @@ public class PlayerProgressManager : MonoBehaviour
             }
         }
         PrintInfo();
-    }
+    }   
 }

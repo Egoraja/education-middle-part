@@ -1,22 +1,24 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-public class TrapInteraction : MonoBehaviour
+public class TrapInteraction : MonoBehaviourPunCallbacks
 {
     [SerializeField] private MultiAimConstraint headTracking;
     [SerializeField] private ChainIKConstraint leftHandChainIKconstrat;
     [SerializeField] private MultiAimConstraint leftHandTracking;
     [SerializeField] private float heightOffset = 0.1f;
+    [SerializeField] private float attackModeDuration = 4;
 
     private Vector3 offset;
-    private Transform trapGameObject;   
+    private Transform trapGameObject;
     private bool trapIsActive = false;
     private bool isTouching = false;
     private float timerAnimation = float.MinValue;
     private float baseWeight = 0;
-    private PlayerProgressManager progressManager;   
+    private PlayerProgressManager progressManager;
 
     private void Start()
     {
@@ -38,9 +40,9 @@ public class TrapInteraction : MonoBehaviour
 
     public void StartFirstPartTrapInteraction(Transform trapTransform, float timer)
     {
-        progressManager.IsMoving = false;  
+        progressManager.IsMoving = false;
         trapGameObject = trapTransform;
-        timerAnimation = timer;       
+        timerAnimation = timer;
         SetConstraintData();
     }
 
@@ -49,15 +51,15 @@ public class TrapInteraction : MonoBehaviour
         trapIsActive = true;
         headTracking.weight = 1f;
     }
-    
+
     private void StartSecondPartInteraction()
-    {       
+    {
         timerAnimation -= Time.deltaTime;
         if (timerAnimation <= 0)
-        {            
-            trapIsActive = false;            
-            trapGameObject.GetComponent<DeathTrapMover>().AttackMode(transform);
-            timerAnimation = trapGameObject.GetComponent<DeathTrapMover>().AttackModeDuration;
+        {
+            trapIsActive = false;
+            trapGameObject.GetComponent<DeathTrapMover>().StartAttack(gameObject.GetPhotonView().ViewID, attackModeDuration);
+            timerAnimation = attackModeDuration;
         }
     }
 
@@ -80,11 +82,23 @@ public class TrapInteraction : MonoBehaviour
         leftHandTracking.weight = baseWeight;
         leftHandChainIKconstrat.weight = baseWeight;
         baseWeight += Time.deltaTime;
+
         if (baseWeight >= 1)
+            photonView.RPC("DestroyTrapSphere", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    private void DestroyTrapSphere()
+    {
+        isTouching = false;
+        if (photonView.IsMine)
         {
-            isTouching = false;
-            Destroy(trapGameObject.gameObject);
             progressManager.PlayerIsDead();
+
+            if (PhotonNetwork.IsMasterClient)
+                PhotonNetwork.Destroy(trapGameObject.gameObject);
+            else
+                trapGameObject.gameObject.SetActive(false);
         }
     }
 }

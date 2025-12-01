@@ -5,37 +5,49 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using System;
+using Photon.Pun;
 
-public class DeathTrapMover : MonoBehaviour
+public class DeathTrapMover : MonoBehaviourPunCallbacks
 {
     [Header("Trap Movement Settings")]
-    [SerializeField] private float jumpPowers;       
+    [SerializeField] private float jumpPowers;
     [SerializeField] private Transform[] pathTransforms;
     [SerializeField] private AnimationCurve animationpatrolCurve;
     [SerializeField] private AnimationCurve animationAttackCurve;
-    [SerializeField] private float attackModeDuration = 4;
-
     private Vector3[] path;
-    private Sequence movementSequence;    
+    private Sequence movementSequence;
 
-    public float AttackModeDuration { get { return attackModeDuration; } }
+    public Transform[] PathTransforms
+    {
+        set { pathTransforms = value; }
+    }
 
     private void Start()
     {
-        Buildpath();       
+        Buildpath();
     }
 
-    public void AttackMode(Transform player)
+    public void StartAttack(int playerViewID, float duration)
     {
+        photonView.RPC("AttackMode", RpcTarget.AllBuffered, playerViewID, duration);
+    }
+
+
+    [PunRPC]
+    public void AttackMode(int playerViewID , float attackModeDuration)
+    {
+        PhotonView playerView = PhotonView.Find(playerViewID);
+        GameObject player = playerView.gameObject;
         movementSequence.Pause();
         Sequence attackSequence = DOTween.Sequence();
         attackSequence.Pause();
         Vector3[] attackPath = new Vector3[2];
         attackPath[0] = transform.position;
         attackPath[1] = player.transform.position + player.transform.forward/2 + Vector3.up *1.1f;
-        attackSequence.Append(transform.DOPath(attackPath,attackModeDuration, PathType.Linear, PathMode.Full3D, 10).SetEase(animationAttackCurve));
+        attackSequence.Append(transform.DOPath(attackPath, attackModeDuration, PathType.Linear, PathMode.Full3D, 10).SetEase(animationAttackCurve));
         attackSequence.Play();
-    }
+    }   
+   
 
     private void Buildpath()
     {
@@ -59,5 +71,5 @@ public class DeathTrapMover : MonoBehaviour
             path[i] = pathTransform[i].position;
         }
         return path;       
-    }   
+    }    
 }

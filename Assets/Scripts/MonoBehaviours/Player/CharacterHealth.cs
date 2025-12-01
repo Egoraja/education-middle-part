@@ -15,6 +15,8 @@ public class CharacterHealth : MonoBehaviour, IReceiving
 
     public float MaxHealth 
         { get { return maxHealth; } }
+
+    
    
     public void SetConfiguration(float health, int currentlevel)
     {                

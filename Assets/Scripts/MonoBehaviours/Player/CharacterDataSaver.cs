@@ -1,25 +1,17 @@
-using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Playables;
 using Newtonsoft.Json;
-
 
 public class CharacterDataSaver : MonoBehaviour
 {
     [SerializeField] private PlayerDefaultSettings playerDefaultSettings;
-    [SerializeField] private FireBaseManager fbManager;
-    [SerializeField] private PlayerProgressManager playerProgressManager;
+    [SerializeField] private FireBaseManager fbManager;    
     private PlayerData playerData;
     private string localPath;
     private bool playerDataInFB = false;
 
-    private async void Start()
-    {
+    public async void LoadPlayerDataStart(PlayerProgressManager playerProgressManager)
+    {        
         localPath = Application.persistentDataPath + "/PlayerData.json";
         LocalLoadPlayerData();
 

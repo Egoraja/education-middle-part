@@ -1,6 +1,6 @@
 
 public interface IPickUpAble
 { 
-    void Execute(PlayerProgressManager playerProgressManager);
+    void Execute();
 }
 

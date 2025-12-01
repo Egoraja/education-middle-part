@@ -1,12 +1,14 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {    
     [Header("Movement Settings")]
     [SerializeField] private CharacterController characterController;
+    [SerializeField] private ShootingAbility shootingAbility;
     [SerializeField] private float walkSpeed = 4f;
     [SerializeField] private float runSpeed = 8f;
     [SerializeField] private float accelerationTime = 0.5f;
@@ -30,8 +32,8 @@ public class PlayerController : MonoBehaviour
 
     [Space(5)]
     [Header("Camera")]
-    [SerializeField] private Transform thirdPersonCamera;
     [SerializeField] private float smoothTime = 0.1f;
+    private Transform thirdPersonCamera;
 
     private float smoothVelocity;
     private AnimationPlayerController animationPlayerController;    
@@ -44,33 +46,40 @@ public class PlayerController : MonoBehaviour
     private bool isMoving = true;
     private bool isDead = false;
     public bool IsMoving { set { isMoving = value; } }
+    public Transform ThirdPersonCamera
+    { set { thirdPersonCamera = value; } }    
 
     private void Start()
     {       
+
         animationPlayerController = GetComponent<AnimationPlayerController>();
     }
 
     private void FixedUpdate()
     {
-        if (isMoving == true)
+        if (photonView.IsMine)
         {
-            HandleGroundCheck();
-            HandleMovementInput();
-            SpeedProgress();            
+            if (isMoving == true)
+            {
+                HandleGroundCheck();
+                HandleMovementInput();
+                SpeedProgress();
+            }
+            else
+            {
+                speedRunProgress = 0f;
+                speedWalkProgress = 0f;
+                currentSpeed = 0f;
+                direction = new Vector3();
+                lastMoveDirection = new Vector3();
+            }
+            ApplyMovement();
         }
-        else
-        {
-            speedRunProgress = 0f;
-            speedWalkProgress = 0f;
-            currentSpeed = 0f;
-            direction = new Vector3();
-            lastMoveDirection = new Vector3();
-        }
-        ApplyMovement();
     }
     private void Update()
-    {       
-        UpdateAnimations();       
+    {     
+        if (photonView.IsMine)
+            UpdateAnimations();
     }
 
     public void PlayerIsDead()
@@ -151,8 +160,10 @@ public class PlayerController : MonoBehaviour
         
         animationPlayerController.SetHorizontalSpeed(horizontalSpeed);
 
-        if (Input.GetKeyDown(KeyCode.Space))        
-            animationPlayerController.PlayWavingAnim();       
+        if (Input.GetKeyDown(KeyCode.E))        
+            animationPlayerController.PlayWavingAnim();
+        if (Input.GetKeyDown(KeyCode.Space))
+            shootingAbility.ShootPress();
 
         if (isDead == true)
             animationPlayerController.PlayDeathAnim();                  

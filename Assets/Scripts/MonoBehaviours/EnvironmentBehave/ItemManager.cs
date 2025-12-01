@@ -1,35 +1,50 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ItemManager : MonoBehaviour, IPickUpAble
+public class ItemManager : MonoBehaviourPunCallbacks, IPickUpAble
 {
     private Transform targetTransform;
-    private PlayerProgressManager playerProgressManager;
-    public void Execute(PlayerProgressManager playerProgressManager)
-    {       
-        if (TryGetComponent(out IPickUpEffect pickUpEffect))
-            pickUpEffect.ApplyEffect(playerProgressManager);      
-        Destroy(gameObject, 0.01f);
+    private bool isCollected = false;    
+    private GameObject localPlayer;
+
+    [PunRPC]
+    public void Execute()
+    {
+        isCollected = true;
+
+        if (localPlayer != null && localPlayer.TryGetComponent(out PlayerProgressManager playerProgress))
+        {
+            if (TryGetComponent(out IPickUpEffect pickUpEffect))
+                pickUpEffect.ApplyEffect(playerProgress);
+        }
+
+        if(PhotonNetwork.IsMasterClient)
+            PhotonNetwork.Destroy(gameObject);
+        else                    
+            gameObject.SetActive(false);        
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out PlayerProgressManager playerProgressManager))
+        if (isCollected) return;
+      
+        if (other.TryGetComponent(out PlayerProgressManager playerProgressManager) && other.GetComponent<PhotonView>().IsMine)
         {
-            targetTransform = other.transform;
-            this.playerProgressManager = playerProgressManager;            
+            localPlayer = other.gameObject;
+            targetTransform = other.transform;                      
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out PlayerProgressManager playerProgressManager))
+        if (other.TryGetComponent(out PlayerProgressManager playerProgressManager) && other.GetComponent<PhotonView>().IsMine)
         {
-            targetTransform = null;
-            this.playerProgressManager = null;            
+            localPlayer = null;
+            targetTransform = null;            
         }
     }  
 
@@ -40,7 +55,8 @@ public class ItemManager : MonoBehaviour, IPickUpAble
             float distance = Vector3.Distance(transform.position, targetTransform.position);
             if (distance < 1.5f)
             {
-                Execute(playerProgressManager);
+                if (photonView != null)
+                    photonView.RPC("Execute", RpcTarget.AllBuffered);
                 targetTransform = null;
             }           
         }

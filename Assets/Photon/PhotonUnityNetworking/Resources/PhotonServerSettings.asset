@@ -40,6 +40,18 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - KeepAliveRPC
+  - SendHello
+  - Execute
+  - StartInteraction
+  - SyncTrapObject
+  - StartAttack
+  - AttackMode
+  - DestroyTrapSphere
+  - DestroyBullet
+  - ApplyDamage
+  - GetInfo
+  - ReceiveEnemyInfo
+  - ReceiveEnemyInfoForShooter
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
