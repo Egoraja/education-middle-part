@@ -8,4 +8,5 @@
 5. Job system,
 6. Async classes and UniRX,
 7. Inventory manager, craftcontroller,
-8. ViewModel (UnityWeld).
+8. ViewModel (UnityWeld),
+9. PhotonPun2 free version
